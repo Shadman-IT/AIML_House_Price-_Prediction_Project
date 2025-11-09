@@ -1,0 +1,101 @@
+"""house_price_realistic.py — Realistic 50-row House Price Prediction"""
+
+import numpy as np
+import pandas as pd
+import joblib
+
+# Step 1: Realistic 50-row dataset
+data = {
+    "city": [
+        "Nanded","Nanded","Nanded","Nanded","Nanded",
+        "Parbhani","Parbhani","Parbhani","Parbhani","Parbhani",
+        "Basmat","Basmat","Basmat","Basmat","Basmat",
+        "Nanded","Nanded","Parbhani","Parbhani","Basmat",
+        "Nanded","Parbhani","Basmat","Nanded","Parbhani",
+        "Basmat","Nanded","Parbhani","Basmat","Nanded",
+        "Parbhani","Basmat","Nanded","Parbhani","Basmat",
+        "Nanded","Parbhani","Basmat","Nanded","Parbhani",
+        "Basmat","Nanded","Parbhani","Basmat","Nanded",
+        "Parbhani","Basmat","Nanded","Parbhani","Basmat"
+    ],
+    "area": [
+        1200, 1500, 1800, 2100, 2500,
+        1000, 1300, 1600, 1900, 2200,
+        800, 1100, 1400, 1700, 2000,
+        2300, 2600, 1200, 1500, 1800,
+        2000, 1300, 1400, 1700, 1900,
+        2100, 2400, 1500, 1800, 2000,
+        2200, 1400, 1600, 1800, 2100,
+        2300, 1500, 1700, 2000, 2200,
+        1900, 2100, 2300, 2500, 2700,
+        2000, 2200, 2400, 2600, 2800
+    ],
+    "bedrooms": [
+        2,3,3,4,4,
+        1,2,3,3,4,
+        1,2,2,3,3,
+        4,4,2,3,3,
+        4,2,3,4,3,
+        4,4,3,3,4,
+        2,3,4,3,4,
+        4,3,3,4,4,
+        3,4,4,5,5,
+        3,4,4,5,5
+    ],
+    "bathrooms": [
+        1,2,2,3,3,
+        1,2,2,3,3,
+        1,1,2,2,2,
+        3,3,2,2,2,
+        3,2,2,3,2,
+        3,3,2,2,3,
+        2,2,3,2,3,
+        3,2,2,3,3,
+        2,3,3,3,4,
+        2,3,3,3,4
+    ],
+    "age": [
+        5,10,15,20,25,
+        2,8,12,18,22,
+        1,5,10,15,20,
+        12,18,6,14,19,
+        20,8,11,15,21,
+        23,10,14,18,20,
+        15,13,17,12,22,
+        24,16,19,21,25,
+        20,22,24,26,28,
+        18,20,22,24,27
+    ],
+    "price": [
+        5200000, 5800000, 6000000, 6500000, 7000000,
+        4800000, 5200000, 5700000, 6200000, 6800000,
+        4000000, 4500000, 5000000, 5500000, 6000000,
+        6400000, 7000000, 5000000, 5600000, 6200000,
+        6000000, 5200000, 5800000, 6500000, 6800000,
+        6400000, 7100000, 5800000, 6200000, 6500000,
+        6800000, 5500000, 6000000, 6400000, 6800000,
+        7200000, 5900000, 6300000, 6700000, 7100000,
+        6200000, 6700000, 7100000, 7500000, 7900000,
+        6500000, 7000000, 7400000, 7800000, 8200000
+    ]
+}
+
+df = pd.DataFrame(data)
+df.to_csv('maharashtra_house_prices_realistic.csv', index=False)
+print("Realistic dataset created:\n", df.head())
+
+# Step 2: Encode City
+cities_unique = df['city'].unique()
+city_map = {city: idx for idx, city in enumerate(cities_unique)}
+df['City_encoded'] = df['city'].map(city_map)
+
+# Step 3: Train Linear Regression (Normal Equation)
+X = df[['City_encoded','area','bedrooms','bathrooms','age']].values
+y = df['price'].values
+X_b = np.c_[np.ones((X.shape[0], 1)), X]  # Add bias term
+theta = np.linalg.inv(X_b.T.dot(X_b)).dot(X_b.T).dot(y)
+print("Model trained. Weights (theta):", theta)
+
+# Step 4: Save Model
+joblib.dump({'theta': theta, 'city_map': city_map}, 'house_price_model_realistic.pkl')
+print("Model saved as 'house_price_model_realistic.pkl'")
