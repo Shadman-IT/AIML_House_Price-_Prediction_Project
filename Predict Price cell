@@ -1,0 +1,33 @@
+# -*- coding: utf-8 -*-
+"""predict_house_price_realistic.py — Predict house price from user input"""
+
+import numpy as np
+import joblib
+
+# Load Model
+model_data = joblib.load('house_price_model_realistic.pkl')
+theta = model_data['theta']
+city_map = model_data['city_map']
+
+
+# Prediction Function
+def predict_price(city, area, bedrooms, bathrooms, age):
+    if city not in city_map:
+        return f"[ERROR] City '{city}' not recognized! Use: {list(city_map.keys())}"
+    
+    city_encoded = city_map[city]
+    X_new = np.array([1, city_encoded, area, bedrooms, bathrooms, age])  # include bias
+    price = X_new.dot(theta)
+    return f"Predicted Price: ₹{int(price)}"
+
+# Take input from user
+print("=== Maharashtra House Price Prediction ===")
+city_input = input("Enter city (Nanded/Parbhani/Basmat): ").strip()
+area_input = int(input("Enter area in sq.ft: "))
+bedrooms_input = int(input("Enter number of bedrooms: "))
+bathrooms_input = int(input("Enter number of bathrooms: "))
+age_input = int(input("Enter age of house: "))
+
+# Predict and display
+predicted_price = predict_price(city_input, area_input, bedrooms_input, bathrooms_input, age_input)
+print(predicted_price)
